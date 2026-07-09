@@ -27,9 +27,17 @@ export function AuthNav() {
       {me?.is_admin && (
         <Link
           href="/admin"
-          className="hidden rounded-md border border-accent/40 px-2.5 py-1 text-xs font-semibold text-accent transition duration-150 hover:bg-accent/10 active:scale-95 sm:inline-block"
+          className="flex items-center gap-1 rounded-md border border-accent/40 px-2 py-1 text-xs font-semibold text-accent transition duration-150 hover:bg-accent/10 active:scale-95"
         >
-          Admin
+          <svg viewBox="0 0 20 20" fill="none" className="h-3.5 w-3.5" aria-hidden>
+            <path
+              d="M10 2l6 2.5v4.7c0 4-2.6 6.9-6 8.3-3.4-1.4-6-4.3-6-8.3V4.5L10 2z"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <span className="hidden sm:inline">Admin</span>
         </Link>
       )}
       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent text-xs font-bold text-white">
