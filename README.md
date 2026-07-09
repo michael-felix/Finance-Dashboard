@@ -3,11 +3,6 @@
 A live financial dashboard tracking ASX-listed stocks, AUD foreign exchange rates, and
 cryptocurrency prices — built as a full-stack, production-style portfolio project.
 
-> **Status:** All 6 phases complete (backend, scheduler, frontend, search/watchlist/charts,
-> testing/Docker/CI, Supabase Auth + admin dashboard), plus a post-launch design pass
-> (light/dark mode, Stack Overflow-inspired UI, demo accounts). See [Build Phases](#build-phases)
-> below, and [Known Issues](#known-issues) for one open auth compatibility gap.
-
 ## Features
 
 - **Live market data** — ASX stocks (yfinance), cryptocurrency (CoinGecko), and AUD FX rates
