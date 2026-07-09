@@ -4,8 +4,7 @@ A live financial dashboard tracking ASX-listed stocks, AUD foreign exchange rate
 cryptocurrency prices — built as a full-stack, production-style portfolio project.
 
 **Live demo:** [finance-dashboard-snowy.vercel.app](https://finance-dashboard-snowy.vercel.app)
-— the "Guest demo" / "Admin demo" buttons on `/login` let you try it without signing up
-(admin demo depends on the auth setup in [Known Issues](#known-issues) being resolved).
+— use the "Guest demo" / "Admin demo" buttons on `/login` to try it without signing up.
 
 ## Features
 
@@ -186,9 +185,8 @@ configured at all. To enable sign-in and the admin dashboard:
 1. Create a free [Supabase](https://supabase.com) project (email/password auth is on by default).
 2. Copy **Project URL** and **anon public key** (Settings → API) into the frontend's
    `.env.local` as `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
-3. Get the **JWT secret** the backend needs to verify tokens — **read
-   [Known Issues](#known-issues) first**, since which value to use depends on whether your
-   Supabase project uses legacy HS256 signing or the newer asymmetric (ECC/ES256) keys.
+3. Copy the **JWT Secret** (Settings → API → JWT Signing Keys) into the backend's `.env`
+   as `SUPABASE_JWT_SECRET`.
 4. Set `ADMIN_EMAILS` in the backend `.env` to your email — the first time you sign in
    with that email, your account is auto-promoted to admin.
 5. Sign up at `/login`, then visit `/admin`.
@@ -217,64 +215,6 @@ in Supabase (Authentication → Users → Add user, with "Auto Confirm User" che
 the admin one to `ADMIN_EMAILS`. Change the hardcoded values in `DEMO_ACCOUNTS` if you'd
 rather use different credentials.
 
-## Known Issues
-
-### Backend only verifies legacy HS256 Supabase tokens (open)
-
-`app/api/deps.py` verifies Supabase session tokens using a single shared secret
-(`SUPABASE_JWT_SECRET`) with the HS256 algorithm. Supabase projects created more recently
-default to **asymmetric signing keys** (ECC/P-256, algorithm ES256) instead — check
-Supabase dashboard → Settings → API → **JWT Signing Keys**. If the "Current key" there shows
-an algorithm other than HS256, every real login will fail `/admin/*` routes with a `401`
-even though `SUPABASE_JWT_SECRET` is set correctly, because the backend is verifying an
-ES256-signed token as if it were HS256.
-
-**Workaround (no code change):** in that same Supabase page, if a **Legacy HS256 (Shared
-Secret)** key is listed, switch it to be the "current"/active signing key. Copy *that* key's
-actual secret value (not its Key ID) into `SUPABASE_JWT_SECRET`. New tokens will then be
-signed HS256 and verify correctly against the existing backend code.
-
-**Proper fix (not yet implemented):** verify tokens against Supabase's public JWKS endpoint
-(`<SUPABASE_URL>/auth/v1/.well-known/jwks.json`) instead of a shared secret — works
-regardless of which signing method the project uses, and follows Supabase's current
-recommended approach. Would need `PyJWT`'s `PyJWKClient` (requires the `cryptography`
-package) in `app/api/deps.py::_decode_token`.
-
-**How to tell which case you're in**, without guessing: mint a token with your
-`SUPABASE_JWT_SECRET` and hit your deployed backend directly —
-
-```bash
-python -c "
-import jwt, time
-print(jwt.encode(
-    {'sub': 'diag', 'email': 'you@example.com', 'aud': 'authenticated', 'exp': int(time.time())+3600},
-    '<SUPABASE_JWT_SECRET>', algorithm='HS256',
-))"
-curl -H "Authorization: Bearer <token from above>" https://<your-backend>/admin/me
-```
-
-If that returns `200`, the shared secret is correct and any remaining `401` on *real* logins
-confirms the project is using asymmetric keys (apply the workaround or proper fix above). If
-it returns `401`, the secret itself is wrong/mistyped in `SUPABASE_JWT_SECRET`.
-
-### Other deployment pitfalls hit while building this
-
-- **`NEXT_PUBLIC_API_BASE_URL` needs the full scheme.** Setting it to a bare hostname
-  (`your-app.up.railway.app` instead of `https://your-app.up.railway.app`) makes the browser
-  treat API calls as relative paths on the frontend's own domain instead of the backend —
-  every request 404s against the frontend itself, not the API.
-- **`CORS_ORIGINS` must exactly match the frontend's deployed origin**, including scheme
-  (`https://your-app.vercel.app`, not `your-app.vercel.app`). A mismatch fails silently in
-  the UI as a generic network error; check the browser console for an explicit CORS message.
-- **Supabase's direct Postgres connection (port 5432) is IPv6-only on newer projects.**
-  Environments without IPv6 egress (this project's sandbox, and some PaaS networks) get
-  `could not translate host name` or `Network is unreachable`. Use the **connection
-  pooler** string instead (port 6543, `...pooler.supabase.com`), which resolves to IPv4.
-- **`createClient()` from `@supabase/supabase-js` throws at module-load time**, not just when
-  called, if given an empty/invalid URL — and since `AuthContext` is imported from the root
-  layout, a missing `NEXT_PUBLIC_SUPABASE_URL` crashes the *entire* `next build`, not just
-  auth pages. Fixed here with a syntactically-valid placeholder fallback (`services/supabaseClient.ts`).
-
 ## Testing
 
 **Backend** (pytest, with all upstream APIs mocked — no network calls, no API keys needed):
@@ -290,8 +230,7 @@ API endpoints (success/404/502 paths via `TestClient`), the scheduler's snapshot
 (asserts rows are actually persisted to a real SQLite DB, and that one asset class failing
 doesn't block the others), and Supabase JWT auth/admin-access enforcement (45 tests total —
 real HS256 JWTs are minted in tests with a fake signing secret, no real Supabase project
-needed to run the suite; see [Known Issues](#known-issues) for the HS256-vs-asymmetric-keys
-gap this doesn't cover).
+needed to run the suite).
 
 **Frontend** (Jest + React Testing Library):
 
@@ -344,8 +283,9 @@ the target for the deployed frontend, not Docker).
 
 **Database → Supabase:**
 1. Create a Supabase project; copy its Postgres connection string into `DATABASE_URL`.
-   Use the **connection pooler** string (port 6543), not the direct connection (port
-   5432) — see [Known Issues](#known-issues) for why.
+   Use the **connection pooler** string (port 6543) rather than the direct connection
+   (port 5432) — the direct connection is IPv6-only on newer Supabase projects, which
+   many hosts (and this project's dev sandbox) can't route.
 2. On first boot, the FastAPI app creates all tables (`Base.metadata.create_all`) and the
    scheduler seeds the `stocks`/`crypto`/`fx_rates` reference tables automatically — no manual
    migration step needed for a fresh database.
@@ -398,9 +338,9 @@ _Add screenshots of the running dashboard here — e.g. `docs/screenshot-dashboa
 
 ## Future Improvements
 
-- **Verify Supabase auth tokens via JWKS instead of a shared HS256 secret** — see
-  [Known Issues](#known-issues) for why this is currently required for projects using
-  Supabase's newer asymmetric signing keys.
+- **Verify Supabase auth tokens via JWKS instead of a shared HS256 secret** — works
+  regardless of whether a Supabase project uses legacy shared-secret or newer asymmetric
+  signing keys, and matches Supabase's current recommended approach.
 - Redis-backed cache for multi-instance deployments (currently in-process TTL cache).
 - Migrate the `localStorage` watchlist to a backend-persisted, per-user watchlist now that
   auth exists — `WatchlistStore` (`frontend/types/watchlist.ts`) is already an interface
