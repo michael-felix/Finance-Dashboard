@@ -3,6 +3,10 @@
 A live financial dashboard tracking ASX-listed stocks, AUD foreign exchange rates, and
 cryptocurrency prices — built as a full-stack, production-style portfolio project.
 
+**Live demo:** [finance-dashboard-snowy.vercel.app](https://finance-dashboard-snowy.vercel.app)
+— the "Guest demo" / "Admin demo" buttons on `/login` let you try it without signing up
+(admin demo depends on the auth setup in [Known Issues](#known-issues) being resolved).
+
 ## Features
 
 - **Live market data** — ASX stocks (yfinance), cryptocurrency (CoinGecko), and AUD FX rates
