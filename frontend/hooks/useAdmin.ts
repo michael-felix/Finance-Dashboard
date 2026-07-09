@@ -17,11 +17,17 @@ import {
 } from "@/services/admin";
 import { useAuth } from "@/context/AuthContext";
 
-/** The current user's profile (including is_admin), only fetched once signed in. */
+/**
+ * The current user's profile (including is_admin), only fetched once signed in.
+ *
+ * The query key includes the Supabase user id so switching accounts in the same
+ * browser tab (sign out, sign in as someone else) never serves a previous user's
+ * cached permission result — each identity gets its own cache entry.
+ */
 export function useMe() {
   const { user } = useAuth();
   return useQuery({
-    queryKey: ["admin-me"],
+    queryKey: ["admin-me", user?.id],
     queryFn: fetchMe,
     enabled: Boolean(user),
     retry: false,
@@ -31,7 +37,7 @@ export function useMe() {
 export function useTrackedAssets() {
   const { user } = useAuth();
   return useQuery({
-    queryKey: ["admin-assets"],
+    queryKey: ["admin-assets", user?.id],
     queryFn: fetchTrackedAssets,
     enabled: Boolean(user),
   });
@@ -73,7 +79,7 @@ export function useAssetMutations() {
 export function useUsers() {
   const { user } = useAuth();
   return useQuery({
-    queryKey: ["admin-users"],
+    queryKey: ["admin-users", user?.id],
     queryFn: fetchUsers,
     enabled: Boolean(user),
   });
@@ -92,7 +98,7 @@ export function useUserMutations() {
 export function useJobRuns() {
   const { user } = useAuth();
   return useQuery({
-    queryKey: ["admin-jobs"],
+    queryKey: ["admin-jobs", user?.id],
     queryFn: fetchJobRuns,
     enabled: Boolean(user),
   });
