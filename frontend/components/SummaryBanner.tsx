@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useMarketSummary } from "@/hooks/useSummary";
 import { formatPercent } from "@/utils/format";
 
@@ -16,11 +18,13 @@ const AUD_INDICATOR_LABEL: Record<string, string> = {
 };
 
 function Tile({
+  href,
   label,
   value,
   detail,
   tone,
 }: {
+  href?: string;
   label: string;
   value: string;
   detail?: string;
@@ -35,14 +39,27 @@ function Tile({
 
   const barClass = tone === "gain" ? "bg-gain dark:bg-gain-dark" : tone === "loss" ? "bg-loss dark:bg-loss-dark" : "bg-brand dark:bg-brand-dark";
 
-  return (
-    <div className="card relative flex-1 overflow-hidden p-4 pl-5 transition duration-150 hover:shadow-md">
+  const content = (
+    <>
       <span className={`absolute inset-y-0 left-0 w-1 ${barClass}`} aria-hidden />
       <p className="text-xs font-medium uppercase tracking-wide text-ink-muted dark:text-ink-muted-dark">{label}</p>
       <p className={`mt-1 text-lg font-semibold ${toneClass}`}>{value}</p>
       {detail && <p className="text-xs text-ink-muted dark:text-ink-muted-dark">{detail}</p>}
-    </div>
+    </>
   );
+
+  if (href) {
+    return (
+      <Link
+        href={href}
+        className="card relative block flex-1 overflow-hidden p-4 pl-5 transition duration-150 hover:-translate-y-0.5 hover:shadow-md active:scale-[0.99]"
+      >
+        {content}
+      </Link>
+    );
+  }
+
+  return <div className="card relative flex-1 overflow-hidden p-4 pl-5">{content}</div>;
 }
 
 function BannerSkeleton() {
@@ -68,12 +85,14 @@ export function SummaryBanner() {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <Tile
+        href={data.strongest_stock ? `/stocks/${data.strongest_stock.symbol}` : undefined}
         label="Strongest ASX Performer"
         value={data.strongest_stock ? data.strongest_stock.symbol : "—"}
         detail={data.strongest_stock ? formatPercent(data.strongest_stock.change_pct) : undefined}
         tone="gain"
       />
       <Tile
+        href={data.weakest_stock ? `/stocks/${data.weakest_stock.symbol}` : undefined}
         label="Weakest ASX Performer"
         value={data.weakest_stock ? data.weakest_stock.symbol : "—"}
         detail={data.weakest_stock ? formatPercent(data.weakest_stock.change_pct) : undefined}

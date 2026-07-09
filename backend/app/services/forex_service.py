@@ -5,12 +5,16 @@ service fetches USD-based rates and derives AUD-based cross rates:
 
     rate(AUD -> X) = rate(USD -> X) / rate(USD -> AUD)
 """
+
 from datetime import UTC, datetime, timedelta
 
 import requests
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from app.config import get_settings
+from app.models.fx import FxRate, FxSnapshot
 from app.schemas.common import PricePoint
 from app.schemas.fx import FxHistoryResponse, FxQuote
 from app.utils.cache import market_data_cache
@@ -88,6 +92,52 @@ def get_fx_quote(quote_currency: str) -> FxQuote:
     if not quotes:
         raise FxPairNotFoundError(f"No data found for currency '{quote_currency}'")
     return quotes[0]
+
+
+def enrich_fx_quotes(quotes: list[FxQuote], db: Session) -> list[FxQuote]:
+    """Fill in day_change_pct and a sparkline from our own stored fx_snapshots.
+
+    Open Exchange Rates' free tier only allows the current rate, so day-over-day
+    change and trend data come from the scheduler's own 15-minute snapshot history
+    instead of another upstream call. Both fields stay None/empty until at least a
+    day of snapshots has accumulated (e.g. right after first deploying).
+    """
+    return [_enrich_one(quote, db) for quote in quotes]
+
+
+def _enrich_one(quote: FxQuote, db: Session) -> FxQuote:
+    fx_rate = db.execute(
+        select(FxRate).where(
+            FxRate.base_currency == quote.base_currency, FxRate.quote_currency == quote.quote_currency
+        )
+    ).scalar_one_or_none()
+    if fx_rate is None:
+        return quote
+
+    since = datetime.utcnow() - timedelta(days=2)
+    snapshots = (
+        db.execute(
+            select(FxSnapshot)
+            .where(FxSnapshot.fx_rate_id == fx_rate.id, FxSnapshot.timestamp >= since)
+            .order_by(FxSnapshot.timestamp)
+        )
+        .scalars()
+        .all()
+    )
+    if not snapshots:
+        return quote
+
+    sparkline = [
+        PricePoint(timestamp=s.timestamp.isoformat(), value=round(s.rate, 6)) for s in snapshots[-30:]
+    ]
+
+    day_ago = datetime.utcnow() - timedelta(hours=24)
+    baseline = next((s for s in snapshots if s.timestamp >= day_ago), None)
+    day_change_pct = (
+        round((quote.rate - baseline.rate) / baseline.rate * 100, 4) if baseline and baseline.rate else None
+    )
+
+    return quote.model_copy(update={"sparkline": sparkline, "day_change_pct": day_change_pct})
 
 
 def get_fx_history(quote_currency: str, chart_range: str) -> FxHistoryResponse:

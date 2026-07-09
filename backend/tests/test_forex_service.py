@@ -1,7 +1,13 @@
 """Unit tests for app.services.forex_service, particularly the USD->AUD cross-rate math."""
+
+from datetime import datetime, timedelta
+
 import pytest
 import requests
 
+from app.database.session import SessionLocal
+from app.models.fx import FxRate, FxSnapshot
+from app.schemas.fx import FxQuote
 from app.services import forex_service
 
 
@@ -59,3 +65,38 @@ def test_aud_cross_rates_raises_when_aud_missing(mocker):
 
     with pytest.raises(forex_service.UpstreamAPIError):
         forex_service._aud_cross_rates()
+
+
+def _make_quote(rate: float, currency: str = "USD") -> FxQuote:
+    return FxQuote(
+        quote_currency=currency, pair=f"AUD/{currency}", rate=rate, updated_at="2026-01-01T00:00:00+00:00"
+    )
+
+
+def test_enrich_fx_quotes_leaves_quote_unchanged_without_tracked_pair():
+    with SessionLocal() as db:
+        quote = _make_quote(0.65)
+        enriched = forex_service.enrich_fx_quotes([quote], db)
+        assert enriched[0].day_change_pct is None
+        assert enriched[0].sparkline == []
+
+
+def test_enrich_fx_quotes_computes_day_change_from_stored_snapshots():
+    with SessionLocal() as db:
+        fx_rate = FxRate(base_currency="AUD", quote_currency="USD")
+        db.add(fx_rate)
+        db.flush()
+
+        old = FxSnapshot(fx_rate_id=fx_rate.id, timestamp=datetime.utcnow() - timedelta(hours=25), rate=0.60)
+        recent = FxSnapshot(
+            fx_rate_id=fx_rate.id, timestamp=datetime.utcnow() - timedelta(hours=1), rate=0.63
+        )
+        db.add_all([old, recent])
+        db.commit()
+
+        quote = _make_quote(0.66)
+        enriched = forex_service.enrich_fx_quotes([quote], db)[0]
+
+        # baseline is the oldest snapshot still within the last 24h ("recent", rate 0.63)
+        assert enriched.day_change_pct == pytest.approx((0.66 - 0.63) / 0.63 * 100, rel=1e-3)
+        assert len(enriched.sparkline) == 2

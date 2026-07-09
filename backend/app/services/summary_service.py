@@ -62,6 +62,7 @@ def build_market_summary(db: Session) -> MarketSummary:
     aud_avg_change = 0.0
     try:
         fx_quotes = forex_service.get_fx_quotes(get_tracked_fx_currencies(db))
+        fx_quotes = forex_service.enrich_fx_quotes(fx_quotes, db)
         deltas = [q.day_change_pct for q in fx_quotes if q.day_change_pct is not None]
         aud_avg_change = round(mean(deltas), 4) if deltas else 0.0
     except Exception as exc:  # noqa: BLE001

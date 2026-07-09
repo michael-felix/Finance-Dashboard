@@ -19,18 +19,23 @@ def list_fx(db: Session = Depends(get_db)) -> FxListResponse:
         quotes = forex_service.get_fx_quotes(get_tracked_fx_currencies(db))
     except UpstreamAPIError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
+    quotes = forex_service.enrich_fx_quotes(quotes, db)
     return FxListResponse(items=quotes, count=len(quotes))
 
 
 @router.get("/{quote_currency}", response_model=FxQuote)
-def get_fx(quote_currency: str = Path(..., description="Quote currency code, e.g. USD")) -> FxQuote:
+def get_fx(
+    quote_currency: str = Path(..., description="Quote currency code, e.g. USD"),
+    db: Session = Depends(get_db),
+) -> FxQuote:
     """Return the live AUD-based rate for a single currency."""
     try:
-        return forex_service.get_fx_quote(quote_currency.upper())
+        quote = forex_service.get_fx_quote(quote_currency.upper())
     except FxPairNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except UpstreamAPIError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
+    return forex_service.enrich_fx_quotes([quote], db)[0]
 
 
 @router.get("/{quote_currency}/history", response_model=FxHistoryResponse)
