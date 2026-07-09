@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-page text-ink-primary antialiased dark:bg-page-dark dark:text-ink-primary-dark;
+  }
+}
+
+@layer utilities {
+  .card {
+    @apply rounded-xl border border-black/10 bg-surface shadow-sm dark:border-white/10 dark:bg-surface-dark;
+  }
+
+  .skeleton {
+    @apply animate-pulse rounded-md bg-black/10 dark:bg-white/10;
+  }
+}

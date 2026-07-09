@@ -1,0 +1,39 @@
+name: finance-dashboard
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: finance
+      POSTGRES_PASSWORD: finance
+      POSTGRES_DB: finance_dashboard
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U finance -d finance_dashboard"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://finance:finance@postgres:5432/finance_dashboard
+      OPEN_EXCHANGE_API_KEY: ${OPEN_EXCHANGE_API_KEY:-}
+      CORS_ORIGINS: http://localhost:3000
+      SCHEDULER_ENABLED: "true"
+      SNAPSHOT_INTERVAL_MINUTES: "15"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
