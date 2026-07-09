@@ -21,10 +21,10 @@ export default function CryptoDetailPage({ params }: { params: Promise<{ id: str
   const inWatchlist = has("crypto", id);
 
   return (
-    <div className="min-h-screen">
+    <div>
       <Header />
-      <main className="mx-auto max-w-4xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
-        <Link href="/" className="text-sm text-brand hover:underline dark:text-brand-dark">
+      <main className="animate-in mx-auto max-w-4xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
+        <Link href="/" className="link inline-flex items-center gap-1 text-sm">
           &larr; Back to dashboard
         </Link>
 
@@ -55,7 +55,7 @@ export default function CryptoDetailPage({ params }: { params: Promise<{ id: str
                   ? remove("crypto", id)
                   : add({ type: "crypto", id, symbol: data.symbol, name: data.name, addedAt: new Date().toISOString() })
               }
-              className="rounded-md border border-black/10 px-3 py-1.5 text-sm font-medium transition hover:bg-black/5 dark:border-white/10 dark:hover:bg-white/5"
+              className="btn-secondary"
             >
               {inWatchlist ? "− Remove from watchlist" : "+ Add to watchlist"}
             </button>
@@ -77,7 +77,7 @@ export default function CryptoDetailPage({ params }: { params: Promise<{ id: str
               <Stat label="7D Change" value={data.change_7d_pct !== null ? formatPercent(data.change_7d_pct) : "—"} />
             </dl>
 
-            <p className="text-xs text-ink-muted">Last updated {formatUpdatedAt(data.updated_at)}</p>
+            <p className="text-xs text-ink-muted dark:text-ink-muted-dark">Last updated {formatUpdatedAt(data.updated_at)}</p>
           </>
         )}
       </main>
@@ -87,8 +87,8 @@ export default function CryptoDetailPage({ params }: { params: Promise<{ id: str
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="card p-3">
-      <dt className="text-xs text-ink-muted">{label}</dt>
+    <div className="card p-3 transition duration-150 hover:shadow-sm">
+      <dt className="text-xs text-ink-muted dark:text-ink-muted-dark">{label}</dt>
       <dd className="mt-1 font-semibold tabular-nums">{value}</dd>
     </div>
   );

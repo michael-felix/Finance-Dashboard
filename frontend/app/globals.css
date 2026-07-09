@@ -3,17 +3,82 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     @apply bg-page text-ink-primary antialiased dark:bg-page-dark dark:text-ink-primary-dark;
+  }
+
+  ::selection {
+    @apply bg-brand/20;
   }
 }
 
 @layer utilities {
+  /* --- Surfaces --- */
   .card {
-    @apply rounded-xl border border-black/10 bg-surface shadow-sm dark:border-white/10 dark:bg-surface-dark;
+    @apply rounded-md border border-border bg-surface dark:border-border-dark dark:bg-surface-dark;
+  }
+
+  .card-interactive {
+    @apply card transition duration-150 ease-out hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-md active:translate-y-0 active:shadow-sm dark:hover:border-brand-dark/40;
   }
 
   .skeleton {
-    @apply animate-pulse rounded-md bg-black/10 dark:bg-white/10;
+    @apply animate-pulse rounded bg-black/[0.06] dark:bg-white/[0.08];
+  }
+
+  /* --- Buttons --- */
+  .btn {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition duration-150 ease-out active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100;
+  }
+
+  .btn-primary {
+    @apply btn bg-brand text-white shadow-sm hover:bg-[#0063ad] dark:bg-brand-dark dark:hover:bg-[#5aa8ff];
+  }
+
+  .btn-secondary {
+    @apply btn border border-border bg-surface text-ink-primary hover:border-ink-muted hover:bg-page dark:border-border-dark dark:bg-surface-dark dark:text-ink-primary-dark dark:hover:bg-white/5;
+  }
+
+  .btn-danger-ghost {
+    @apply btn text-loss hover:bg-loss/10 dark:text-loss-dark dark:hover:bg-loss-dark/10;
+  }
+
+  /* --- Forms --- */
+  .input {
+    @apply w-full rounded-md border border-border bg-surface px-3 py-1.5 text-sm text-ink-primary outline-none transition duration-150 placeholder:text-ink-muted focus:border-brand focus:ring-2 focus:ring-brand/25 dark:border-border-dark dark:bg-surface-dark dark:text-ink-primary-dark dark:focus:border-brand-dark dark:focus:ring-brand-dark/25;
+  }
+
+  /* --- Text / links --- */
+  .link {
+    @apply text-brand transition hover:underline dark:text-brand-dark;
+  }
+
+  /* --- Badges --- */
+  .badge {
+    @apply inline-flex items-center rounded px-1.5 py-0.5 text-xs font-semibold;
+  }
+
+  .badge-gain {
+    @apply badge bg-gain/10 text-gain dark:bg-gain-dark/15 dark:text-gain-dark;
+  }
+
+  .badge-loss {
+    @apply badge bg-loss/10 text-loss dark:bg-loss-dark/15 dark:text-loss-dark;
+  }
+
+  .badge-neutral {
+    @apply badge bg-brand/10 text-brand dark:bg-brand-dark/15 dark:text-brand-dark;
+  }
+
+  .animate-in {
+    animation: fade-in 0.25s ease-out both;
+  }
+
+  .section-heading {
+    @apply mb-4 border-b border-border pb-2 text-xl font-bold text-ink-primary dark:border-border-dark dark:text-ink-primary-dark;
   }
 }

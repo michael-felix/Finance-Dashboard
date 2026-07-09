@@ -10,6 +10,7 @@ import {
   YAxis,
 } from "recharts";
 
+import { useTheme } from "@/context/ThemeContext";
 import type { ChartRange, PricePoint } from "@/types/market";
 
 const RANGES: ChartRange[] = ["1D", "1W", "1M", "3M"];
@@ -48,14 +49,19 @@ function ChartTooltip({
   const point = payload[0];
   if (!point) return null;
   return (
-    <div className="card px-3 py-2 text-xs shadow-md">
-      <p className="text-ink-muted">{formatTimestampTick(point.payload.timestamp, range)}</p>
+    <div className="card px-3 py-2 text-xs shadow-lg">
+      <p className="text-ink-muted dark:text-ink-muted-dark">{formatTimestampTick(point.payload.timestamp, range)}</p>
       <p className="font-semibold tabular-nums text-ink-primary dark:text-ink-primary-dark">
         {valueFormatter(point.value)}
       </p>
     </div>
   );
 }
+
+const CHART_COLORS = {
+  light: { gain: "#006300", loss: "#d1383d", grid: "#e1e0d9", axis: "#848d95" },
+  dark: { gain: "#3dd63d", loss: "#f0716f", grid: "#2a343d", axis: "#7d8891" },
+};
 
 /** Historical price chart with 1D/1W/1M/3M range switching. Used on every asset detail page. */
 export function PriceChart({
@@ -67,7 +73,9 @@ export function PriceChart({
   valueFormatter,
   positive,
 }: PriceChartProps) {
-  const stroke = positive ? "#006300" : "#e34948";
+  const { theme } = useTheme();
+  const colors = CHART_COLORS[theme];
+  const stroke = positive ? colors.gain : colors.loss;
 
   return (
     <div className="card p-4">
@@ -77,10 +85,10 @@ export function PriceChart({
             key={r}
             type="button"
             onClick={() => onRangeChange(r)}
-            className={`rounded-md px-3 py-1 text-sm font-medium transition ${
+            className={`rounded-md px-3 py-1 text-sm font-medium transition duration-150 active:scale-95 ${
               r === range
                 ? "bg-brand text-white dark:bg-brand-dark"
-                : "text-ink-secondary hover:bg-black/5 dark:text-ink-secondary-dark dark:hover:bg-white/5"
+                : "text-ink-secondary hover:bg-page dark:text-ink-secondary-dark dark:hover:bg-white/5"
             }`}
           >
             {r}
@@ -91,12 +99,12 @@ export function PriceChart({
       <div className="h-72 w-full">
         {isLoading && <div className="skeleton h-full w-full" />}
         {isError && !isLoading && (
-          <div className="flex h-full items-center justify-center text-sm text-ink-muted">
+          <div className="flex h-full items-center justify-center text-sm text-ink-muted dark:text-ink-muted-dark">
             Historical data unavailable for this range.
           </div>
         )}
         {!isLoading && !isError && points.length < 2 && (
-          <div className="flex h-full items-center justify-center text-sm text-ink-muted">
+          <div className="flex h-full items-center justify-center text-sm text-ink-muted dark:text-ink-muted-dark">
             Not enough data yet for this range.
           </div>
         )}
@@ -109,17 +117,17 @@ export function PriceChart({
                   <stop offset="100%" stopColor={stroke} stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e1e0d9" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} vertical={false} />
               <XAxis
                 dataKey="timestamp"
                 tickFormatter={(v: string) => formatTimestampTick(v, range)}
-                stroke="#898781"
+                stroke={colors.axis}
                 tick={{ fontSize: 11 }}
                 minTickGap={70}
               />
               <YAxis
                 domain={["auto", "auto"]}
-                stroke="#898781"
+                stroke={colors.axis}
                 tick={{ fontSize: 11 }}
                 width={64}
                 tickFormatter={(v: number) => valueFormatter(v)}
@@ -133,7 +141,7 @@ export function PriceChart({
                     valueFormatter={valueFormatter}
                   />
                 )}
-                cursor={{ stroke: "#898781", strokeWidth: 1, strokeDasharray: "3 3" }}
+                cursor={{ stroke: colors.axis, strokeWidth: 1, strokeDasharray: "3 3" }}
               />
               <Area
                 type="monotone"
@@ -142,6 +150,7 @@ export function PriceChart({
                 strokeWidth={2}
                 fill="url(#price-fill)"
                 isAnimationActive={false}
+                animationDuration={300}
               />
             </AreaChart>
           </ResponsiveContainer>

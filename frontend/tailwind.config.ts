@@ -1,54 +1,72 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  darkMode: "media",
+  darkMode: "class",
   content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
-        surface: {
-          DEFAULT: "#fcfcfb",
-          dark: "#1a1a19",
-        },
+        // Page background (body).
         page: {
-          DEFAULT: "#f9f9f7",
-          dark: "#0d0d0d",
+          DEFAULT: "#f8f9f9",
+          dark: "#0f1720",
+        },
+        // Card / panel background.
+        surface: {
+          DEFAULT: "#ffffff",
+          dark: "#182430",
+        },
+        // Always-dark top nav bar, in both themes (Stack Overflow-style).
+        nav: {
+          DEFAULT: "#171a22",
+          border: "#2c2f36",
         },
         ink: {
-          primary: "#0b0b0b",
-          "primary-dark": "#ffffff",
-          secondary: "#52514e",
-          "secondary-dark": "#c3c2b7",
-          muted: "#898781",
+          primary: "#232629",
+          "primary-dark": "#f1f2f3",
+          secondary: "#6a737c",
+          "secondary-dark": "#9fa6ad",
+          muted: "#848d95",
+          "muted-dark": "#78828a",
+        },
+        border: {
+          DEFAULT: "#d6d9dc",
+          dark: "#2f3a44",
         },
         grid: {
           DEFAULT: "#e1e0d9",
           dark: "#2c2c2a",
         },
-        baseline: {
-          DEFAULT: "#c3c2b7",
-          dark: "#383835",
-        },
         gain: {
           DEFAULT: "#006300",
-          dark: "#0ca30c",
+          dark: "#3dd63d",
         },
         loss: {
-          DEFAULT: "#e34948",
-          dark: "#e66767",
+          DEFAULT: "#d1383d",
+          dark: "#f0716f",
         },
+        // Primary action color (buttons, links).
         brand: {
-          DEFAULT: "#2a78d6",
-          dark: "#3987e5",
+          DEFAULT: "#0074cc",
+          dark: "#4098ff",
+        },
+        // Logo / highlight accent — used sparingly, not for actions.
+        accent: {
+          DEFAULT: "#f48024",
+          dark: "#ffa143",
         },
       },
       fontFamily: {
-        sans: [
-          "system-ui",
-          "-apple-system",
-          "Segoe UI",
-          "sans-serif",
-        ],
+        sans: ["system-ui", "-apple-system", "Segoe UI", "sans-serif"],
+      },
+      keyframes: {
+        "fade-in": {
+          "0%": { opacity: "0", transform: "translateY(4px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+      },
+      animation: {
+        "fade-in": "fade-in 0.25s ease-out",
       },
     },
   },

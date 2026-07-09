@@ -21,10 +21,10 @@ export default function FxDetailPage({ params }: { params: Promise<{ currency: s
   const inWatchlist = has("fx", currency);
 
   return (
-    <div className="min-h-screen">
+    <div>
       <Header />
-      <main className="mx-auto max-w-4xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
-        <Link href="/" className="text-sm text-brand hover:underline dark:text-brand-dark">
+      <main className="animate-in mx-auto max-w-4xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
+        <Link href="/" className="link inline-flex items-center gap-1 text-sm">
           &larr; Back to dashboard
         </Link>
 
@@ -63,7 +63,7 @@ export default function FxDetailPage({ params }: { params: Promise<{ currency: s
                       addedAt: new Date().toISOString(),
                     })
               }
-              className="rounded-md border border-black/10 px-3 py-1.5 text-sm font-medium transition hover:bg-black/5 dark:border-white/10 dark:hover:bg-white/5"
+              className="btn-secondary"
             >
               {inWatchlist ? "− Remove from watchlist" : "+ Add to watchlist"}
             </button>
@@ -78,7 +78,7 @@ export default function FxDetailPage({ params }: { params: Promise<{ currency: s
               positive={(data.day_change_pct ?? 0) >= 0}
             />
 
-            <p className="text-xs text-ink-muted">Last updated {formatUpdatedAt(data.updated_at)}</p>
+            <p className="text-xs text-ink-muted dark:text-ink-muted-dark">Last updated {formatUpdatedAt(data.updated_at)}</p>
           </>
         )}
       </main>

@@ -9,7 +9,7 @@ export function Watchlist() {
   if (items.length === 0) {
     return (
       <section id="watchlist" className="scroll-mt-24">
-        <h2 className="mb-4 text-xl font-semibold">My Watchlist</h2>
+        <h2 className="section-heading">My Watchlist</h2>
         <div className="card p-6 text-center text-sm text-ink-secondary dark:text-ink-secondary-dark">
           Use the search bar above to add stocks, crypto, or FX pairs to your watchlist.
         </div>
@@ -19,7 +19,7 @@ export function Watchlist() {
 
   return (
     <section id="watchlist" className="scroll-mt-24">
-      <h2 className="mb-4 text-xl font-semibold">My Watchlist</h2>
+      <h2 className="section-heading">My Watchlist</h2>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {items.map((item) => (
           <WatchlistCard

@@ -33,7 +33,7 @@ export function MarketCard({
   return (
     <Link
       href={href}
-      className="card group relative flex flex-col gap-3 p-4 transition hover:-translate-y-0.5 hover:shadow-md"
+      className="card-interactive group relative flex flex-col gap-3 p-4 active:scale-[0.99]"
     >
       {onRemove && (
         <button
@@ -44,7 +44,7 @@ export function MarketCard({
             e.stopPropagation();
             onRemove();
           }}
-          className="absolute right-2 top-2 z-10 rounded-full p-1 text-ink-muted opacity-0 transition hover:bg-black/5 hover:text-loss group-hover:opacity-100 dark:hover:bg-white/10 dark:hover:text-loss-dark"
+          className="absolute right-2 top-2 z-10 rounded-md p-1 text-ink-muted opacity-0 transition duration-150 hover:bg-loss/10 hover:text-loss group-hover:opacity-100 active:scale-90 dark:text-ink-muted-dark dark:hover:bg-loss-dark/10 dark:hover:text-loss-dark"
         >
           <svg viewBox="0 0 20 20" fill="none" className="h-4 w-4" aria-hidden>
             <path
@@ -59,16 +59,10 @@ export function MarketCard({
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="truncate font-semibold text-ink-primary dark:text-ink-primary-dark">{title}</p>
-          <p className="truncate text-xs text-ink-muted">{subtitle}</p>
+          <p className="truncate text-xs text-ink-muted dark:text-ink-muted-dark">{subtitle}</p>
         </div>
         {changePct !== null && (
-          <span
-            className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${
-              positive
-                ? "bg-gain/10 text-gain dark:text-gain-dark"
-                : "bg-loss/10 text-loss dark:text-loss-dark"
-            }`}
-          >
+          <span className={positive ? "badge-gain shrink-0" : "badge-loss shrink-0"}>
             {formatPercent(changePct)}
           </span>
         )}
@@ -80,17 +74,17 @@ export function MarketCard({
 
       <SparklineChart points={sparkline} positive={positive} />
 
-      {meta && <p className="text-xs text-ink-muted">{meta}</p>}
+      {meta && <p className="text-xs text-ink-muted dark:text-ink-muted-dark">{meta}</p>}
 
       {secondaryChanges.length > 0 && (
-        <div className="flex gap-4 border-t border-black/5 pt-2 text-xs text-ink-secondary dark:border-white/5 dark:text-ink-secondary-dark">
+        <div className="flex gap-4 border-t border-border pt-2 text-xs text-ink-secondary dark:border-border-dark dark:text-ink-secondary-dark">
           {secondaryChanges.map((change) => (
             <span key={change.label}>
               {change.label}:{" "}
               <span
                 className={
                   change.pct === null
-                    ? "text-ink-muted"
+                    ? "text-ink-muted dark:text-ink-muted-dark"
                     : change.pct >= 0
                       ? "text-gain dark:text-gain-dark"
                       : "text-loss dark:text-loss-dark"

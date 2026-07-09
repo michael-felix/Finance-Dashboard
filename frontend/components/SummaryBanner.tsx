@@ -33,11 +33,14 @@ function Tile({
         ? "text-loss dark:text-loss-dark"
         : "text-ink-primary dark:text-ink-primary-dark";
 
+  const barClass = tone === "gain" ? "bg-gain dark:bg-gain-dark" : tone === "loss" ? "bg-loss dark:bg-loss-dark" : "bg-brand dark:bg-brand-dark";
+
   return (
-    <div className="card flex-1 p-4">
-      <p className="text-xs font-medium uppercase tracking-wide text-ink-muted">{label}</p>
+    <div className="card relative flex-1 overflow-hidden p-4 pl-5 transition duration-150 hover:shadow-md">
+      <span className={`absolute inset-y-0 left-0 w-1 ${barClass}`} aria-hidden />
+      <p className="text-xs font-medium uppercase tracking-wide text-ink-muted dark:text-ink-muted-dark">{label}</p>
       <p className={`mt-1 text-lg font-semibold ${toneClass}`}>{value}</p>
-      {detail && <p className="text-xs text-ink-muted">{detail}</p>}
+      {detail && <p className="text-xs text-ink-muted dark:text-ink-muted-dark">{detail}</p>}
     </div>
   );
 }

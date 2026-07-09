@@ -41,29 +41,29 @@ export default function AdminAssetsPage() {
             placeholder="Ticker (e.g. WOW.AX)"
             value={stockTicker}
             onChange={(e) => setStockTicker(e.target.value)}
-            className="rounded-md border border-black/10 bg-surface px-3 py-1.5 text-sm dark:border-white/10 dark:bg-surface-dark"
+            className="rounded-md border border-border bg-surface px-3 py-1.5 text-sm text-ink-primary outline-none transition duration-150 focus:border-brand focus:ring-2 focus:ring-brand/25 dark:border-border-dark dark:bg-surface-dark dark:text-ink-primary-dark"
           />
           <input
             required
             placeholder="Company name"
             value={stockName}
             onChange={(e) => setStockName(e.target.value)}
-            className="rounded-md border border-black/10 bg-surface px-3 py-1.5 text-sm dark:border-white/10 dark:bg-surface-dark"
+            className="rounded-md border border-border bg-surface px-3 py-1.5 text-sm text-ink-primary outline-none transition duration-150 focus:border-brand focus:ring-2 focus:ring-brand/25 dark:border-border-dark dark:bg-surface-dark dark:text-ink-primary-dark"
           />
-          <button type="submit" disabled={addStock.isPending} className="rounded-md bg-brand px-3 py-1.5 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50 dark:bg-brand-dark">
+          <button type="submit" disabled={addStock.isPending} className="btn-primary">
             Add
           </button>
         </form>
-        <ul className="divide-y divide-black/5 dark:divide-white/5">
+        <ul className="divide-y divide-border dark:divide-border-dark">
           {data.stocks.map((s) => (
             <li key={s.ticker} className="flex items-center justify-between py-2 text-sm">
               <span>{s.ticker} — {s.name}</span>
-              <button type="button" onClick={() => removeStock.mutate(s.ticker)} className="text-loss hover:underline dark:text-loss-dark">
+              <button type="button" onClick={() => removeStock.mutate(s.ticker)} className="btn-danger-ghost px-2 py-1 text-xs">
                 Remove
               </button>
             </li>
           ))}
-          {data.stocks.length === 0 && <li className="py-2 text-sm text-ink-muted">No stocks tracked yet.</li>}
+          {data.stocks.length === 0 && <li className="py-2 text-sm text-ink-muted dark:text-ink-muted-dark">No stocks tracked yet.</li>}
         </ul>
       </section>
 
@@ -84,36 +84,36 @@ export default function AdminAssetsPage() {
             placeholder="CoinGecko id (e.g. cardano)"
             value={cryptoId}
             onChange={(e) => setCryptoId(e.target.value)}
-            className="rounded-md border border-black/10 bg-surface px-3 py-1.5 text-sm dark:border-white/10 dark:bg-surface-dark"
+            className="rounded-md border border-border bg-surface px-3 py-1.5 text-sm text-ink-primary outline-none transition duration-150 focus:border-brand focus:ring-2 focus:ring-brand/25 dark:border-border-dark dark:bg-surface-dark dark:text-ink-primary-dark"
           />
           <input
             required
             placeholder="Symbol (e.g. ADA)"
             value={cryptoSymbol}
             onChange={(e) => setCryptoSymbol(e.target.value)}
-            className="rounded-md border border-black/10 bg-surface px-3 py-1.5 text-sm dark:border-white/10 dark:bg-surface-dark"
+            className="rounded-md border border-border bg-surface px-3 py-1.5 text-sm text-ink-primary outline-none transition duration-150 focus:border-brand focus:ring-2 focus:ring-brand/25 dark:border-border-dark dark:bg-surface-dark dark:text-ink-primary-dark"
           />
           <input
             required
             placeholder="Name"
             value={cryptoName}
             onChange={(e) => setCryptoName(e.target.value)}
-            className="rounded-md border border-black/10 bg-surface px-3 py-1.5 text-sm dark:border-white/10 dark:bg-surface-dark"
+            className="rounded-md border border-border bg-surface px-3 py-1.5 text-sm text-ink-primary outline-none transition duration-150 focus:border-brand focus:ring-2 focus:ring-brand/25 dark:border-border-dark dark:bg-surface-dark dark:text-ink-primary-dark"
           />
-          <button type="submit" disabled={addCrypto.isPending} className="rounded-md bg-brand px-3 py-1.5 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50 dark:bg-brand-dark">
+          <button type="submit" disabled={addCrypto.isPending} className="btn-primary">
             Add
           </button>
         </form>
-        <ul className="divide-y divide-black/5 dark:divide-white/5">
+        <ul className="divide-y divide-border dark:divide-border-dark">
           {data.crypto.map((c) => (
             <li key={c.coingecko_id} className="flex items-center justify-between py-2 text-sm">
               <span>{c.symbol} — {c.name}</span>
-              <button type="button" onClick={() => removeCrypto.mutate(c.coingecko_id)} className="text-loss hover:underline dark:text-loss-dark">
+              <button type="button" onClick={() => removeCrypto.mutate(c.coingecko_id)} className="btn-danger-ghost px-2 py-1 text-xs">
                 Remove
               </button>
             </li>
           ))}
-          {data.crypto.length === 0 && <li className="py-2 text-sm text-ink-muted">No coins tracked yet.</li>}
+          {data.crypto.length === 0 && <li className="py-2 text-sm text-ink-muted dark:text-ink-muted-dark">No coins tracked yet.</li>}
         </ul>
       </section>
 
@@ -131,22 +131,22 @@ export default function AdminAssetsPage() {
             placeholder="Currency code (e.g. CAD)"
             value={fxCurrency}
             onChange={(e) => setFxCurrency(e.target.value)}
-            className="rounded-md border border-black/10 bg-surface px-3 py-1.5 text-sm dark:border-white/10 dark:bg-surface-dark"
+            className="rounded-md border border-border bg-surface px-3 py-1.5 text-sm text-ink-primary outline-none transition duration-150 focus:border-brand focus:ring-2 focus:ring-brand/25 dark:border-border-dark dark:bg-surface-dark dark:text-ink-primary-dark"
           />
-          <button type="submit" disabled={addFx.isPending} className="rounded-md bg-brand px-3 py-1.5 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50 dark:bg-brand-dark">
+          <button type="submit" disabled={addFx.isPending} className="btn-primary">
             Add
           </button>
         </form>
-        <ul className="divide-y divide-black/5 dark:divide-white/5">
+        <ul className="divide-y divide-border dark:divide-border-dark">
           {data.fx.map((f) => (
             <li key={f.quote_currency} className="flex items-center justify-between py-2 text-sm">
               <span>AUD/{f.quote_currency}</span>
-              <button type="button" onClick={() => removeFx.mutate(f.quote_currency)} className="text-loss hover:underline dark:text-loss-dark">
+              <button type="button" onClick={() => removeFx.mutate(f.quote_currency)} className="btn-danger-ghost px-2 py-1 text-xs">
                 Remove
               </button>
             </li>
           ))}
-          {data.fx.length === 0 && <li className="py-2 text-sm text-ink-muted">No FX pairs tracked yet.</li>}
+          {data.fx.length === 0 && <li className="py-2 text-sm text-ink-muted dark:text-ink-muted-dark">No FX pairs tracked yet.</li>}
         </ul>
       </section>
     </div>

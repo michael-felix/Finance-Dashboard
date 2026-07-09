@@ -12,7 +12,7 @@ export function FxSection() {
 
   return (
     <section id="fx" className="scroll-mt-24">
-      <h2 className="mb-4 text-xl font-semibold">FX Rates</h2>
+      <h2 className="section-heading">FX Rates</h2>
       {isLoading && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {Array.from({ length: 5 }).map((_, i) => (
